@@ -9,12 +9,16 @@ RUN uv sync --no-dev --no-install-project --frozen 2>/dev/null || uv sync --no-d
 
 FROM python:3.12-slim
 
-RUN groupadd -r bridge && useradd -r -g bridge -s /usr/sbin/nologin bridge
+# Fixed numeric UID/GID: Kubernetes' runAsNonRoot check can't verify a named
+# USER is non-root without inspecting /etc/passwd, and refuses to start the
+# container ("image has non-numeric user") unless runAsUser is also set
+# numerically in the pod spec — so pin one here and match it there.
+RUN groupadd -r -g 10001 bridge && useradd -r -u 10001 -g bridge -s /usr/sbin/nologin bridge
 WORKDIR /app
 
 COPY --from=build /app/.venv /app/.venv
 COPY bridge.py ./
 ENV PATH="/app/.venv/bin:$PATH" PYTHONUNBUFFERED=1
 
-USER bridge:bridge
+USER 10001:10001
 ENTRYPOINT ["python", "bridge.py"]
