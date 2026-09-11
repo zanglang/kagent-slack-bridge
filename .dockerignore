@@ -1,0 +1,10 @@
+.git
+.github
+.venv
+__pycache__
+*.pyc
+.env
+k8s
+README.md
+slack-app-manifest.json
+.env.example

@@ -1,0 +1,45 @@
+# Reference copy. The deployed manifests live in the k8s-at-home repo under
+# kagent/manifests/ (ArgoCD-managed). Keep the two in sync.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kagent-slack-bridge
+  namespace: kagent
+  labels:
+    app.kubernetes.io/name: kagent-slack-bridge
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate  # Socket Mode: one connection; avoid two pods racing
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: kagent-slack-bridge
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: kagent-slack-bridge
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: bridge
+          image: ghcr.io/zanglang/kagent-slack-bridge:0.1.0
+          env:
+            - name: KAGENT_A2A_URL
+              value: http://kagent-controller.kagent:8083/api/a2a/kagent/k8s-agent/
+          envFrom:
+            - secretRef:
+                name: kagent-slack-bridge
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          resources:
+            requests:
+              cpu: 25m
+              memory: 96Mi
+            limits:
+              memory: 192Mi

@@ -1,0 +1,21 @@
+[project]
+name = "kagent-slack-bridge"
+version = "0.1.0"
+description = "Slack <-> kagent A2A bridge (Socket Mode)"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "slack-bolt>=1.21",
+    "aiohttp>=3.10",
+    "httpx>=0.27",
+]
+
+[dependency-groups]
+dev = ["ruff>=0.6"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
