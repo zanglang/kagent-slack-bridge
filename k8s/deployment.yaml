@@ -21,11 +21,13 @@ spec:
     spec:
       securityContext:
         runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
         seccompProfile:
           type: RuntimeDefault
       containers:
         - name: bridge
-          image: ghcr.io/zanglang/kagent-slack-bridge:0.1.0
+          image: ghcr.io/zanglang/kagent-slack-bridge:0.1.1
           env:
             - name: KAGENT_A2A_URL
               value: http://kagent-controller.kagent:8083/api/a2a/kagent/k8s-agent/
